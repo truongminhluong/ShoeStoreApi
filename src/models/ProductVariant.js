@@ -9,11 +9,26 @@ const productVariantSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Màu
-    color: {
+    // SKU
+    sku: {
+      type: String,
+      unique: true,
+      trim: true,
+    },
+
+    // Tên màu
+    colorName: {
       type: String,
       required: true,
       trim: true,
+    },
+
+    // Mã màu
+    colorCode: {
+      type: String,
+      required: true,
+      trim: true,
+      uppercase: true,
     },
 
     // Size
@@ -22,18 +37,24 @@ const productVariantSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Số lượng tồn kho
+    // Tồn kho
     stock: {
       type: Number,
-      required: true,
       default: 0,
       min: 0,
     },
 
-    // Ảnh theo màu (không bắt buộc)
+    // Ảnh theo màu
     image: {
       type: String,
       default: "",
+    },
+
+    // Trạng thái
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
     },
   },
   {
@@ -41,4 +62,19 @@ const productVariantSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("ProductVariant", productVariantSchema);
+// Không cho trùng Product + Color + Size
+productVariantSchema.index(
+  {
+    product: 1,
+    colorName: 1,
+    size: 1,
+  },
+  {
+    unique: true,
+  }
+);
+
+export default mongoose.model(
+  "ProductVariant",
+  productVariantSchema
+);

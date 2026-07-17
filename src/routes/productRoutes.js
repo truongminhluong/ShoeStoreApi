@@ -4,23 +4,21 @@ import {
   getProducts,
   getProductById,
   getProductDetail,
-  createProduct,
-  updateProduct,
-  deleteProduct,
+  getNewestProducts,
 } from "../controllers/productController.js";
 
 const router = express.Router();
 
+// User lấy danh sách sản phẩm active
 router.get("/", getProducts);
 
+// User lấy sản phẩm mới
+router.get("/new", getNewestProducts);
+
+// User xem chi tiết sản phẩm
 router.get("/detail/:id", getProductDetail);
 
+// User lấy sản phẩm theo id
 router.get("/:id", getProductById);
-
-router.post("/", createProduct);
-
-router.put("/:id", updateProduct);
-
-router.delete("/:id", deleteProduct);
 
 export default router;

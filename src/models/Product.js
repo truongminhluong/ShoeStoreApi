@@ -68,6 +68,13 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    // Trạng thái sản phẩm
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
   },
   {
     timestamps: true,

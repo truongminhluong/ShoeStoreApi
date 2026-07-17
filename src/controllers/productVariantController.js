@@ -1,25 +1,14 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 
-import {
-  successResponse,
-  errorResponse,
-} from "../utils/response.js";
+import { successResponse } from "../utils/response.js";
 
 import {
   getVariantsService,
   getVariantByIdService,
   getVariantsByProductService,
-  createVariantService,
-  updateVariantService,
-  deleteVariantService,
 } from "../services/productVariantService.js";
 
-import {
-  validateCreateVariant,
-  validateUpdateVariant,
-} from "../validators/productVariantValidator.js";
-
-// Lấy tất cả biến thể
+// Lấy tất cả Variant
 export const getVariants = asyncHandler(async (req, res) => {
   const variants = await getVariantsService();
 
@@ -30,7 +19,7 @@ export const getVariants = asyncHandler(async (req, res) => {
   );
 });
 
-// Lấy biến thể theo ID
+// Lấy Variant theo ID
 export const getVariantById = asyncHandler(async (req, res) => {
   const variant = await getVariantByIdService(req.params.id);
 
@@ -41,7 +30,7 @@ export const getVariantById = asyncHandler(async (req, res) => {
   );
 });
 
-// Lấy tất cả biến thể theo sản phẩm
+// Lấy Variant theo Product
 export const getVariantsByProduct = asyncHandler(async (req, res) => {
   const variants = await getVariantsByProductService(
     req.params.productId
@@ -51,53 +40,5 @@ export const getVariantsByProduct = asyncHandler(async (req, res) => {
     res,
     "Lấy danh sách biến thể thành công",
     variants
-  );
-});
-
-// Thêm biến thể
-export const createVariant = asyncHandler(async (req, res) => {
-  const error = validateCreateVariant(req.body);
-
-  if (error) {
-    return errorResponse(res, error, 400);
-  }
-
-  const variant = await createVariantService(req.body);
-
-  return successResponse(
-    res,
-    "Thêm biến thể thành công",
-    variant,
-    201
-  );
-});
-
-// Cập nhật biến thể
-export const updateVariant = asyncHandler(async (req, res) => {
-  const error = validateUpdateVariant(req.body);
-
-  if (error) {
-    return errorResponse(res, error, 400);
-  }
-
-  const variant = await updateVariantService(
-    req.params.id,
-    req.body
-  );
-
-  return successResponse(
-    res,
-    "Cập nhật biến thể thành công",
-    variant
-  );
-});
-
-// Xóa biến thể
-export const deleteVariant = asyncHandler(async (req, res) => {
-  await deleteVariantService(req.params.id);
-
-  return successResponse(
-    res,
-    "Xóa biến thể thành công"
   );
 });

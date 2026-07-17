@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const brandSchema = new mongoose.Schema(
   {
+    // Tên thương hiệu
     name: {
       type: String,
       required: true,
@@ -9,9 +10,17 @@ const brandSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // Logo
     logo: {
       type: String,
       default: "",
+    },
+
+    // Trạng thái
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
     },
   },
   {
