@@ -2,8 +2,7 @@ import Product from "../models/Product.js";
 import ProductVariant from "../models/ProductVariant.js";
 import ApiError from "../utils/ApiError.js";
 
-
-// User lấy sản phẩm đang bán
+// User lấy danh sách sản phẩm đang bán
 export const getProductsService = async () => {
   const products = await Product.find({
     status: "active",
@@ -17,8 +16,7 @@ export const getProductsService = async () => {
   return products;
 };
 
-
-// User lấy chi tiết sản phẩm
+// User lấy sản phẩm theo ID
 export const getProductByIdService = async (id) => {
   const product = await Product.findOne({
     _id: id,
@@ -27,29 +25,24 @@ export const getProductByIdService = async (id) => {
     .populate("brand", "name logo")
     .populate("category", "name");
 
-
   if (!product) {
     throw new ApiError(
       404,
       "Không tìm thấy sản phẩm"
     );
   }
-
 
   return product;
 };
 
-
-// Chi tiết sản phẩm + biến thể
+// User lấy chi tiết sản phẩm + danh sách biến thể
 export const getProductDetailService = async (id) => {
-
   const product = await Product.findOne({
-    _id:id,
-    status:"active"
+    _id: id,
+    status: "active",
   })
     .populate("brand", "name logo")
     .populate("category", "name");
-
 
   if (!product) {
     throw new ApiError(
@@ -58,62 +51,35 @@ export const getProductDetailService = async (id) => {
     );
   }
 
-
   const variants = await ProductVariant.find({
-    product:id,
+    product: id,
+    status: "active",
   })
-  .sort({
-    color:1,
-    size:1,
-  });
-
-
-  const groupedVariants = {};
-
-
-  variants.forEach((variant)=>{
-
-    if(!groupedVariants[variant.color]){
-      groupedVariants[variant.color] = [];
-    }
-
-
-    groupedVariants[variant.color].push({
-
-      _id:variant._id,
-      size:variant.size,
-      stock:variant.stock,
-      image:variant.image,
-
+    .select(
+      "_id sku colorName colorCode size stock image"
+    )
+    .sort({
+      colorName: 1,
+      size: 1,
     });
-
-  });
-
-
 
   return {
     product,
-    variants:groupedVariants,
+    variants,
   };
-
 };
 
-
-
-// Hàng mới về
+// User lấy hàng mới về
 export const getNewestProductsService = async () => {
-
   const products = await Product.find({
-    status:"active",
+    status: "active",
   })
-  .populate("brand","name logo")
-  .populate("category","name")
-  .sort({
-    createdAt:-1,
-  })
-  .limit(10);
-
+    .populate("brand", "name logo")
+    .populate("category", "name")
+    .sort({
+      createdAt: -1,
+    })
+    .limit(10);
 
   return products;
-
 };

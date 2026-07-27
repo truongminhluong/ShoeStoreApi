@@ -15,8 +15,12 @@ import adminProductVariantRoutes from "./routes/adminProductVariantRoutes.js";
 
 import authRoutes from "./routes/authRoutes.js";
 
+import orderRoutes from "./routes/orderRoutes.js";
+import addressRoutes from "./routes/addressRoutes.js";
+
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 import favoriteRoutes from "./routes/favoriteRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 const app = express();
 
@@ -39,6 +43,15 @@ app.use("/api/products", productRoutes);
 // Product Variant
 app.use("/api/product-variants", productVariantRoutes);
 
+// Order
+app.use("/api/orders", orderRoutes);
+
+// Address
+app.use("/api/addresses", addressRoutes);
+
+// Payment
+app.use("/api/payment", paymentRoutes);
+
 // ======================================================
 // ADMIN API
 // ======================================================
@@ -53,10 +66,7 @@ app.use("/api/admin/categories", adminCategoryRoutes);
 app.use("/api/admin/products", adminProductRoutes);
 
 // Product Variant
-app.use(
-  "/api/admin/product-variants",
-  adminProductVariantRoutes
-);
+app.use("/api/admin/product-variants", adminProductVariantRoutes);
 
 // ======================================================
 // AUTH
