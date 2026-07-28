@@ -21,6 +21,9 @@ import addressRoutes from "./routes/addressRoutes.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 import favoriteRoutes from "./routes/favoriteRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import adminOrderRoutes from "./routes/adminOrderRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 const app = express();
 
@@ -52,6 +55,12 @@ app.use("/api/addresses", addressRoutes);
 // Payment
 app.use("/api/payment", paymentRoutes);
 
+// Notification
+app.use("/api/notifications", notificationRoutes);
+
+// Review
+app.use("/api/reviews", reviewRoutes);
+
 // ======================================================
 // ADMIN API
 // ======================================================
@@ -67,6 +76,9 @@ app.use("/api/admin/products", adminProductRoutes);
 
 // Product Variant
 app.use("/api/admin/product-variants", adminProductVariantRoutes);
+
+// Order
+app.use("/api/admin/orders", adminOrderRoutes);
 
 // ======================================================
 // AUTH

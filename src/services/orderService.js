@@ -223,12 +223,41 @@ export const cancelOrderService = async (userId, orderId) => {
   }
 
   if (!["pending", "confirmed"].includes(order.status)) {
-    throw new ApiError(400, "Không thể hủy đơn hàng ở trạng thái hiện tại");
+    throw new ApiError(
+      400,
+      "Không thể hủy đơn hàng ở trạng thái hiện tại"
+    );
   }
+
+
+  // ===============================
+  // HOÀN TRẢ SỐ LƯỢNG KHO
+  // ===============================
+
+  for (const item of order.items) {
+
+    const variant = await ProductVariant.findById(
+      item.variant
+    );
+
+    if (variant) {
+
+      variant.stock += item.quantity;
+
+      await variant.save();
+
+    }
+  }
+
+
+  // ===============================
+  // CẬP NHẬT TRẠNG THÁI ĐƠN
+  // ===============================
 
   order.status = "cancelled";
 
   await order.save();
+
 
   return order;
 };
