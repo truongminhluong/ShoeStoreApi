@@ -24,6 +24,8 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import adminVoucherRoutes from "./routes/adminVoucherRoutes.js";
+import voucherRoutes from "./routes/voucherRoutes.js";
 
 const app = express();
 
@@ -61,6 +63,9 @@ app.use("/api/notifications", notificationRoutes);
 // Review
 app.use("/api/reviews", reviewRoutes);
 
+// Voucher
+app.use("/api/vouchers", voucherRoutes);
+
 // ======================================================
 // ADMIN API
 // ======================================================
@@ -79,6 +84,9 @@ app.use("/api/admin/product-variants", adminProductVariantRoutes);
 
 // Order
 app.use("/api/admin/orders", adminOrderRoutes);
+
+// Voucher
+app.use("/api/admin/vouchers", adminVoucherRoutes);
 
 // ======================================================
 // AUTH
