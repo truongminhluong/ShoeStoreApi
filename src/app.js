@@ -2,30 +2,27 @@ import express from "express";
 import cors from "cors";
 
 import brandRoutes from "./routes/brandRoutes.js";
-import adminBrandRoutes from "./routes/adminBrandRoutes.js";
-
 import categoryRoutes from "./routes/categoryRoutes.js";
-import adminCategoryRoutes from "./routes/adminCategoryRoutes.js";
-
 import productRoutes from "./routes/productRoutes.js";
-import adminProductRoutes from "./routes/adminProductRoutes.js";
-
 import productVariantRoutes from "./routes/productVariantRoutes.js";
-import adminProductVariantRoutes from "./routes/adminProductVariantRoutes.js";
-
-import authRoutes from "./routes/authRoutes.js";
-
+import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import addressRoutes from "./routes/addressRoutes.js";
-
-import errorMiddleware from "./middlewares/errorMiddleware.js";
 import favoriteRoutes from "./routes/favoriteRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
-import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
-import adminVoucherRoutes from "./routes/adminVoucherRoutes.js";
 import voucherRoutes from "./routes/voucherRoutes.js";
+
+import adminUserRoutes from "./routes/adminUserRoutes.js";
+import adminBrandRoutes from "./routes/adminBrandRoutes.js";
+import adminCategoryRoutes from "./routes/adminCategoryRoutes.js";
+import adminProductRoutes from "./routes/adminProductRoutes.js";
+import adminProductVariantRoutes from "./routes/adminProductVariantRoutes.js";
+import adminOrderRoutes from "./routes/adminOrderRoutes.js";
+import adminVoucherRoutes from "./routes/adminVoucherRoutes.js";
+
+import errorMiddleware from "./middlewares/errorMiddleware.js";
 
 const app = express();
 
@@ -35,6 +32,9 @@ app.use(express.json());
 // ======================================================
 // USER API
 // ======================================================
+
+// Đăng ký - Đăng nhập - Hồ sơ
+app.use("/api/users", userRoutes);
 
 // Brand
 app.use("/api/brands", brandRoutes);
@@ -54,6 +54,9 @@ app.use("/api/orders", orderRoutes);
 // Address
 app.use("/api/addresses", addressRoutes);
 
+// Favorite
+app.use("/api/favorites", favoriteRoutes);
+
 // Payment
 app.use("/api/payment", paymentRoutes);
 
@@ -69,6 +72,9 @@ app.use("/api/vouchers", voucherRoutes);
 // ======================================================
 // ADMIN API
 // ======================================================
+
+// User
+app.use("/api/admin/users", adminUserRoutes);
 
 // Brand
 app.use("/api/admin/brands", adminBrandRoutes);
@@ -89,18 +95,12 @@ app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/vouchers", adminVoucherRoutes);
 
 // ======================================================
-// AUTH
-// ======================================================
-
-app.use("/api/auth", authRoutes);
-app.use("/api/favorites", favoriteRoutes);
-
-// ======================================================
 // HOME
 // ======================================================
 
 app.get("/", (req, res) => {
   res.json({
+    success: true,
     message: "Welcome ShoeStore API",
   });
 });

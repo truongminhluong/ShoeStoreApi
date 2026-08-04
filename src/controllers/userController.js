@@ -3,7 +3,7 @@ import {
   loginService,
   updateProfileService,
   changePasswordService,
-} from "../services/authService.js";
+} from "../services/userService.js";
 
 import {
   successResponse,

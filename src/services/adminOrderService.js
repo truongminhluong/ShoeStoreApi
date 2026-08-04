@@ -42,13 +42,9 @@ export const getAdminOrderByIdService = async (orderId) => {
 const getOrderStatusMessage = (status) => {
   const messages = {
     pending: "Đơn hàng của bạn đang chờ xử lý",
-
     confirmed: "Đơn hàng của bạn đã được xác nhận",
-
     shipping: "Đơn hàng của bạn đang được giao",
-
     delivered: "Đơn hàng của bạn đã giao thành công",
-
     cancelled: "Đơn hàng của bạn đã bị hủy",
   };
 
@@ -87,7 +83,7 @@ export const updateOrderStatusService = async (orderId, status) => {
   }
 
   // ===============================
-  // KIỂM TRA TRẠNG THÁI CŨ
+  // KIỂM TRA TRẠNG THÁI HIỆN TẠI
   // ===============================
 
   const oldStatus = order.status;
@@ -96,11 +92,40 @@ export const updateOrderStatusService = async (orderId, status) => {
     throw new ApiError(400, "Trạng thái đơn hàng không thay đổi");
   }
 
+  // Không cho cập nhật nếu đơn đã hoàn thành hoặc đã hủy
+  if (["delivered", "cancelled"].includes(oldStatus)) {
+    throw new ApiError(
+      400,
+      "Đơn hàng đã hoàn thành hoặc đã hủy, không thể cập nhật",
+    );
+  }
+
+  // ===============================
+  // KIỂM TRA LUỒNG CHUYỂN TRẠNG THÁI
+  // ===============================
+
+  const validTransitions = {
+    pending: ["confirmed", "cancelled"],
+    confirmed: ["shipping", "cancelled"],
+    shipping: ["delivered"],
+    delivered: [],
+    cancelled: [],
+  };
+
+  if (!validTransitions[oldStatus].includes(status)) {
+    throw new ApiError(400, `Không thể chuyển từ ${oldStatus} sang ${status}`);
+  }
+
   // ===============================
   // CẬP NHẬT TRẠNG THÁI
   // ===============================
 
   order.status = status;
+
+  // Nếu COD và đã giao thì tự động cập nhật thanh toán
+  if (status === "delivered" && order.paymentMethod === "cod") {
+    order.paymentStatus = "paid";
+  }
 
   await order.save();
 
@@ -110,21 +135,15 @@ export const updateOrderStatusService = async (orderId, status) => {
 
   const notification = await Notification.create({
     user: order.user,
-
     order: order._id,
-
     title: "Cập nhật đơn hàng",
-
     message: getOrderStatusMessage(status),
-
     type: "order_status",
-
     isRead: false,
   });
 
   return {
     order,
-
     notification,
   };
 };
