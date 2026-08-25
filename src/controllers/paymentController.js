@@ -72,17 +72,26 @@ export const createVnpayPayment = async (req, res, next) => {
 
 export const vnpayReturn = async (req, res, next) => {
   try {
-    console.log("VNPAY RETURN:", req.query);
+    console.log("========================================");
+    console.log("🔥 VNPAY RETURN");
+    console.log("URL:", req.originalUrl);
+    console.log("Query:", req.query);
+    console.log("========================================");
 
-    const vnpParams = {
-      ...req.query,
-    };
+    const vnpParams = { ...req.query };
 
-    // ===============================
-    // KIỂM TRA CHỮ KÝ
-    // ===============================
+    if (Object.keys(vnpParams).length === 0) {
+      console.log("❌ Không nhận được dữ liệu query từ VNPAY");
+
+      return res.status(400).json({
+        success: false,
+        message: "Không nhận được dữ liệu trả về từ VNPAY",
+      });
+    }
 
     const isValid = verifyVnpaySignature(vnpParams);
+
+    console.log("🔐 Signature valid:", isValid);
 
     if (!isValid) {
       return res.status(400).json({
@@ -92,14 +101,12 @@ export const vnpayReturn = async (req, res, next) => {
     }
 
     const responseCode = vnpParams.vnp_ResponseCode;
-
     const txnRef = vnpParams.vnp_TxnRef;
-
     const transactionNo = vnpParams.vnp_TransactionNo;
 
-    // ===============================
-    // TÌM ĐƠN HÀNG
-    // ===============================
+    console.log("ResponseCode:", responseCode);
+    console.log("TxnRef:", txnRef);
+    console.log("TransactionNo:", transactionNo);
 
     const order = await Order.findById(txnRef);
 
@@ -110,10 +117,7 @@ export const vnpayReturn = async (req, res, next) => {
       });
     }
 
-    // ===============================
-    // ĐÃ THANH TOÁN
-    // ===============================
-
+    // Đã xử lý trước đó
     if (order.paymentStatus === "paid") {
       return res.status(200).json({
         success: true,
@@ -126,11 +130,8 @@ export const vnpayReturn = async (req, res, next) => {
       });
     }
 
-    // ===============================
-    // THANH TOÁN THẤT BẠI
-    // ===============================
-
-    if (responseCode !== "00") {
+    // Thanh toán thất bại
+    if (responseCode !== "00" || vnpParams.vnp_TransactionStatus !== "00") {
       order.paymentStatus = "failed";
 
       await order.save();
@@ -146,10 +147,7 @@ export const vnpayReturn = async (req, res, next) => {
       });
     }
 
-    // ===============================
-    // KIỂM TRA TỒN KHO
-    // ===============================
-
+    // Kiểm tra tồn kho
     for (const item of order.items) {
       const variant = await ProductVariant.findById(item.variant);
 
@@ -162,10 +160,7 @@ export const vnpayReturn = async (req, res, next) => {
       }
     }
 
-    // ===============================
-    // TRỪ TỒN KHO
-    // ===============================
-
+    // Trừ tồn kho
     for (const item of order.items) {
       await ProductVariant.findByIdAndUpdate(item.variant, {
         $inc: {
@@ -174,21 +169,16 @@ export const vnpayReturn = async (req, res, next) => {
       });
     }
 
-    // ===============================
-    // CẬP NHẬT ĐƠN HÀNG
-    // ===============================
-
+    // Cập nhật đơn hàng
     order.paymentStatus = "paid";
-
     order.status = "confirmed";
-
     order.transactionId = transactionNo;
 
     await order.save();
 
-    // ===============================
-    // TRẢ KẾT QUẢ
-    // ===============================
+    console.log("✅ VNPAY PAYMENT SUCCESS");
+    console.log("Order:", order._id);
+    console.log("Transaction:", transactionNo);
 
     return res.status(200).json({
       success: true,
@@ -200,6 +190,7 @@ export const vnpayReturn = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error("❌ VNPAY RETURN ERROR:", error);
     next(error);
   }
 };
