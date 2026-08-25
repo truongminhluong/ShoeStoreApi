@@ -25,10 +25,7 @@ export const createReviewService = async (
   });
 
   if (!order) {
-    throw new ApiError(
-      404,
-      "Không tìm thấy đơn hàng",
-    );
+    throw new ApiError(404, "Không tìm thấy đơn hàng");
   }
 
   // =========================
@@ -49,48 +46,35 @@ export const createReviewService = async (
   // =========================
 
   const orderItem = order.items.find(
-    (item) =>
-      item.product.toString() ===
-      productId.toString(),
+    (item) => item.product.toString() === productId.toString(),
   );
 
   if (!orderItem) {
-    throw new ApiError(
-      400,
-      "Sản phẩm không thuộc đơn hàng này",
-    );
+    throw new ApiError(400, "Sản phẩm không thuộc đơn hàng này");
   }
 
   // =========================
   // KIỂM TRA ĐÃ ĐÁNH GIÁ CHƯA
   // =========================
 
-  const existingReview =
-    await Review.findOne({
-      user: userId,
-      product: productId,
-      order: orderId,
-    });
+  const existingReview = await Review.findOne({
+    user: userId,
+    product: productId,
+    order: orderId,
+  });
 
   if (existingReview) {
-    throw new ApiError(
-      400,
-      "Bạn đã đánh giá sản phẩm này trong đơn hàng",
-    );
+    throw new ApiError(400, "Bạn đã đánh giá sản phẩm này trong đơn hàng");
   }
 
   // =========================
   // KIỂM TRA SẢN PHẨM
   // =========================
 
-  const product =
-    await Product.findById(productId);
+  const product = await Product.findById(productId);
 
   if (!product) {
-    throw new ApiError(
-      404,
-      "Không tìm thấy sản phẩm",
-    );
+    throw new ApiError(404, "Không tìm thấy sản phẩm");
   }
 
   // =========================
@@ -115,17 +99,13 @@ export const createReviewService = async (
   });
 
   const totalRating = reviews.reduce(
-    (total, review) =>
-      total + review.rating,
+    (total, review) => total + review.rating,
     0,
   );
 
-  const averageRating =
-    totalRating / reviews.length;
+  const averageRating = totalRating / reviews.length;
 
-  product.rating = Number(
-    averageRating.toFixed(1),
-  );
+  product.rating = Number(averageRating.toFixed(1));
 
   await product.save();
 
@@ -136,9 +116,7 @@ export const createReviewService = async (
 // LẤY DANH SÁCH ĐÁNH GIÁ CỦA SẢN PHẨM
 // ==========================================
 
-export const getProductReviewsService = async (
-  productId,
-) => {
+export const getProductReviewsService = async (productId) => {
   const reviews = await Review.find({
     product: productId,
   })
@@ -154,11 +132,7 @@ export const getProductReviewsService = async (
 // KIỂM TRA SẢN PHẨM ĐÃ ĐƯỢC ĐÁNH GIÁ
 // ==========================================
 
-export const checkReviewedService = async (
-  userId,
-  productId,
-  orderId
-) => {
+export const checkReviewedService = async (userId, productId, orderId) => {
   const review = await Review.findOne({
     user: userId,
     product: productId,
@@ -166,4 +140,16 @@ export const checkReviewedService = async (
   });
 
   return review;
+};
+
+// ==========================================
+// ĐẾM SỐ ĐÁNH GIÁ CỦA USER
+// ==========================================
+
+export const getMyReviewCountService = async (userId) => {
+  const count = await Review.countDocuments({
+    user: userId,
+  });
+
+  return count;
 };
