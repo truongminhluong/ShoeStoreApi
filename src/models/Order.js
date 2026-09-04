@@ -33,14 +33,20 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
   {
-    // Người đặt hàng
+    // ============================================================
+    // NGƯỜI ĐẶT HÀNG
+    // ============================================================
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
-    // Danh sách sản phẩm
+    // ============================================================
+    // DANH SÁCH SẢN PHẨM
+    // ============================================================
+
     items: {
       type: [orderItemSchema],
       required: true,
@@ -52,68 +58,98 @@ const orderSchema = new mongoose.Schema(
       },
     },
 
-    // Thông tin giao hàng
+    // ============================================================
+    // THÔNG TIN GIAO HÀNG
+    // ============================================================
+
     shippingAddress: {
       fullName: {
         type: String,
         required: true,
+        trim: true,
       },
 
       phone: {
         type: String,
         required: true,
+        trim: true,
       },
 
       address: {
         type: String,
         required: true,
+        trim: true,
       },
     },
 
-    // Tiền hàng
+    // ============================================================
+    // TIỀN HÀNG
+    // ============================================================
+
     subtotal: {
       type: Number,
       required: true,
       min: 0,
     },
 
+    // Phí vận chuyển
     shippingFee: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
+    // Thuế VAT
+    tax: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    // Giảm giá
     discount: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
+    // Tổng tiền cuối cùng phải thanh toán
     total: {
       type: Number,
       required: true,
       min: 0,
     },
 
-    // Phương thức thanh toán
+    // ============================================================
+    // PHƯƠNG THỨC THANH TOÁN
+    // ============================================================
+
     paymentMethod: {
       type: String,
       enum: ["cod", "vnpay"],
       default: "cod",
     },
 
-    // Trạng thái thanh toán
+    // ============================================================
+    // TRẠNG THÁI THANH TOÁN
+    // ============================================================
+
     paymentStatus: {
       type: String,
       enum: ["pending", "paid", "failed"],
       default: "pending",
     },
-    
-    // Mã giao dịch (nếu có)
+
+    // Mã giao dịch VNPAY
     transactionId: {
       type: String,
       default: null,
     },
 
-    // Trạng thái đơn hàng
+    // ============================================================
+    // TRẠNG THÁI ĐƠN HÀNG
+    // ============================================================
+
     status: {
       type: String,
       enum: ["pending", "confirmed", "shipping", "delivered", "cancelled"],

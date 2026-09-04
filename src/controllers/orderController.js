@@ -6,17 +6,9 @@ import {
 } from "../services/orderService.js";
 
 // Tạo đơn hàng
-export const createOrder = async (
-  req,
-  res,
-  next
-) => {
+export const createOrder = async (req, res, next) => {
   try {
-    const order =
-      await createOrderService(
-        req.user._id,
-        req.body
-      );
+    const order = await createOrderService(req.user._id, req.body);
 
     res.status(201).json({
       success: true,
@@ -29,16 +21,9 @@ export const createOrder = async (
 };
 
 // Lấy danh sách đơn hàng của User
-export const getMyOrders = async (
-  req,
-  res,
-  next
-) => {
+export const getMyOrders = async (req, res, next) => {
   try {
-    const orders =
-      await getMyOrdersService(
-        req.user._id
-      );
+    const orders = await getMyOrdersService(req.user._id);
 
     res.status(200).json({
       success: true,
@@ -50,17 +35,9 @@ export const getMyOrders = async (
 };
 
 // Lấy chi tiết đơn hàng
-export const getMyOrderDetail = async (
-  req,
-  res,
-  next
-) => {
+export const getMyOrderDetail = async (req, res, next) => {
   try {
-    const order =
-      await getMyOrderDetailService(
-        req.user._id,
-        req.params.id
-      );
+    const order = await getMyOrderDetailService(req.user._id, req.params.id);
 
     res.status(200).json({
       success: true,
@@ -72,19 +49,17 @@ export const getMyOrderDetail = async (
 };
 
 // Hủy đơn hàng
-export const cancelOrder = async (
-  req,
-  res,
-  next
-) => {
+export const cancelOrder = async (req, res, next) => {
   try {
-    const order =
-      await cancelOrderService(
-        req.user._id,
-        req.params.id
-      );
+    const { id } = req.params;
 
-    res.status(200).json({
+    if (!id) {
+      throw new ApiError(400, "Thiếu mã đơn hàng");
+    }
+
+    const order = await cancelOrderService(req.user._id, id);
+
+    return res.status(200).json({
       success: true,
       message: "Hủy đơn hàng thành công",
       data: order,

@@ -131,18 +131,24 @@ export const vnpayReturn = async (req, res, next) => {
     }
 
     // Thanh toán thất bại
-    if (responseCode !== "00" || vnpParams.vnp_TransactionStatus !== "00") {
+    if (responseCode !== "00") {
+      console.log("❌ VNPAY PAYMENT FAILED");
+      console.log("ResponseCode:", responseCode);
+      console.log("Order:", order._id);
+
       order.paymentStatus = "failed";
+      order.status = "cancelled";
 
       await order.save();
 
-      return res.status(200).json({
+      return res.json({
         success: false,
-        message: "Thanh toán VNPAY thất bại",
+        message: "Thanh toán VNPAY thất bại hoặc đã bị hủy",
         data: {
           orderId: order._id,
-          responseCode,
           paymentStatus: order.paymentStatus,
+          status: order.status,
+          responseCode,
         },
       });
     }
